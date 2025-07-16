@@ -2,19 +2,22 @@ services:
   - type: web
     name: escrowflow-bot
     runtime: python
+    pythonVersion: "3.10.13"  # Explicit version
     buildCommand: |
-  python -m pip install --upgrade pip
-  pip install --no-cache-dir -r requirements.txt
-    startCommand: gunicorn --worker-class gevent --workers 1 app:application
+      python -m pip install --upgrade pip
+      pip install --no-cache-dir -r requirements.txt
+    startCommand: gunicorn --workers 1 --threads 4 --timeout 120 app:application
     envVars:
       - key: TELEGRAM_BOT_TOKEN
         value: "8125885886:AAF1Q4MiOHNiTSo2BhjEmnUiQ39yAtGzDYs"
+      - key: PYTHONUNBUFFERED
+        value: "1"
     plan: free
     region: oregon
     autoDeploy: true
     healthCheckPath: /health
-
-# Health check endpoint (add to app.py)
-@app.route('/health')
-def health():
-    return jsonify({"status": "healthy"}), 200
+    env: python
+    disk:
+      name: data
+      mountPath: /data
+      sizeGB: 1
