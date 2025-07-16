@@ -1,151 +1,33 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
-    <title>Escrowflow Dashboard</title>
+    <title>Escrowflow</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        .escrow-card {
-            transition: all 0.3s;
-            cursor: pointer;
-        }
-        .escrow-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-        }
+        body { padding: 20px; }
+        .card { margin-bottom: 20px; }
     </style>
 </head>
 <body>
-    <div class="container py-3">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h3>Escrowflow Dashboard</h3>
-            <button id="logout-btn" class="btn btn-sm btn-outline-danger">Logout</button>
-        </div>
-        
-        <div class="row mb-4">
-            <div class="col-md-4">
-                <div class="card text-white bg-primary mb-3">
-                    <div class="card-body">
-                        <h5 class="card-title">Active Escrows</h5>
-                        <p class="card-text display-6" id="active-escrows">0</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card text-white bg-success mb-3">
-                    <div class="card-body">
-                        <h5 class="card-title">Completed</h5>
-                        <p class="card-text display-6" id="completed-escrows">0</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card text-white bg-info mb-3">
-                    <div class="card-body">
-                        <h5 class="card-title">Total Value</h5>
-                        <p class="card-text display-6" id="total-value"></p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="d-flex justify-content-between mb-3">
-            <h4>Your Escrows</h4>
-            <button id="new-escrow-btn" class="btn btn-primary">New Escrow</button>
-        </div>
-        
-        <div id="escrows-list" class="row">
-            <!-- Escrows will be loaded here -->
+    <div class="container">
+        <h3 class="mb-4">Escrow Dashboard</h3>
+        <div id="app-content">
+            <!-- Content loaded dynamically -->
         </div>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        const tg = window.Telegram.WebApp;
+        const tg = Telegram.WebApp;
         tg.expand();
         
-        let userData = null;
-        
-        // Initialize the app
-        async function initApp() {
-            try {
-                // Verify user with backend
-                const response = await fetch('/api/auth', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: initData=
-                });
-                
-                const data = await response.json();
-                if (data.status === 'success') {
-                    userData = data.user;
-                    loadDashboard();
-                } else {
-                    tg.showAlert("Authentication failed. Please try again.");
-                    tg.close();
-                }
-            } catch (error) {
-                console.error("Error:", error);
-                tg.showAlert("An error occurred. Please try again.");
-            }
-        }
-        
-        // Load dashboard data
-        async function loadDashboard() {
-            try {
-                // In a real app, you would fetch this from your backend
-                const escrows = [
-                    { id: 'esc1', amount: 100, status: 'active', parties: ['Buyer', 'Seller'] },
-                    { id: 'esc2', amount: 250, status: 'completed', parties: ['Client', 'Freelancer'] }
-                ];
-                
-                document.getElementById('active-escrows').textContent = 
-                    escrows.filter(e => e.status === 'active').length;
-                document.getElementById('completed-escrows').textContent = 
-                    escrows.filter(e => e.status === 'completed').length;
-                document.getElementById('total-value').textContent = '$' + 
-                    escrows.reduce((sum, e) => sum + e.amount, 0);
-                
-                const escrowsList = document.getElementById('escrows-list');
-                escrowsList.innerHTML = escrows.map(escrow => 
-                    <div class="col-md-6 mb-3">
-                        <div class="card escrow-card">
-                            <div class="card-body">
-                                <h5 class="card-title">Escrow #</h5>
-                                <p class="card-text">
-                                    <strong>Amount:</strong> }{escrow.amount}<br>
-                                    <strong>Status:</strong> <span class="badge bg-"></span><br>
-                                    <strong>Parties:</strong> 
-                                </p>
-                                <a href="#" class="btn btn-sm btn-outline-primary">View Details</a>
-                            </div>
-                        </div>
-                    </div>
-                ).join('');
-            } catch (error) {
-                console.error("Error loading dashboard:", error);
-            }
-        }
-        
-        // Event listeners
-        document.getElementById('new-escrow-btn').addEventListener('click', () => {
-            tg.showPopup({
-                title: 'New Escrow',
-                message: 'This would open a form to create a new escrow in a real app.',
-                buttons: [{ type: 'ok' }]
-            });
-        });
-        
-        document.getElementById('logout-btn').addEventListener('click', () => {
+        tg.MainButton.setText('Continue').show().onClick(() => {
             tg.close();
         });
         
-        // Initialize the app
-        initApp();
+        // Initialization logic here
     </script>
 </body>
 </html>
