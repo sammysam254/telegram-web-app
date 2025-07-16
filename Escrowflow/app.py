@@ -1,4 +1,6 @@
-import os
+import sys
+if sys.version_info >= (3, 12):
+    raise RuntimeError("Python 3.12+ not supported. Use Python 3.11")import os
 import hashlib
 import hmac
 from flask import Flask, request, jsonify, render_template
