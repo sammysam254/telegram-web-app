@@ -14,7 +14,3 @@ services:
     autoDeploy: true
     branch: main
     healthCheckPath: /health
-    disk:
-      name: escrowflow-disk
-      mountPath: /data
-      sizeGB: 1
