@@ -165,33 +165,61 @@ async def handle_callback_query(update: Update, context: ContextTypes.DEFAULT_TY
 def run_flask():
     """Run Flask app for health checks"""
     port = int(os.environ.get('PORT', 10000))
-    app.run(host='0.0.0.0', port=port, debug=False)
+    from gunicorn.app.wsgiapp import WSGIApplication
+    
+    class StandaloneApplication(WSGIApplication):
+        def __init__(self, app, options=None):
+            self.options = options or {}
+            self.application = app
+            super().__init__()
+        
+        def load_config(self):
+            config = {key: value for key, value in self.options.items()
+                     if key in self.cfg.settings and value is not None}
+            for key, value in config.items():
+                self.cfg.set(key.lower(), value)
+        
+        def load(self):
+            return self.application
+    
+    options = {
+        'bind': f'0.0.0.0:{port}',
+        'workers': 1,
+        'timeout': 120,
+    }
+    
+    StandaloneApplication(app, options).run()
 
 def main() -> None:
     """Start the bot."""
-    # Start Flask app in a separate thread for health checks
-    flask_thread = threading.Thread(target=run_flask)
-    flask_thread.daemon = True
-    flask_thread.start()
-    
-    # Create application
-    application = Application.builder().token(BOT_TOKEN).build()
-    
-    # Add handlers
-    application.add_handler(CommandHandler("start", start))
-    application.add_handler(CommandHandler("help", help_command))
-    application.add_handler(CommandHandler("support", support_command))
-    application.add_handler(MessageHandler(filters.StatusUpdate.WEB_APP_DATA, handle_web_app_data))
-    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, start))
-    
-    # Add callback query handler
-    from telegram.ext import CallbackQueryHandler
-    application.add_handler(CallbackQueryHandler(handle_callback_query))
-    
-    # Run the bot
-    print("🚀 Escrowflow bot is starting...")
-    logger.info("Bot started successfully")
-    application.run_polling(allowed_updates=Update.ALL_TYPES)
+    try:
+        # Start Flask app in a separate thread for health checks
+        flask_thread = threading.Thread(target=run_flask)
+        flask_thread.daemon = True
+        flask_thread.start()
+        
+        # Create application
+        application = Application.builder().token(BOT_TOKEN).build()
+        
+        # Add handlers
+        application.add_handler(CommandHandler("start", start))
+        application.add_handler(CommandHandler("help", help_command))
+        application.add_handler(CommandHandler("support", support_command))
+        application.add_handler(MessageHandler(filters.StatusUpdate.WEB_APP_DATA, handle_web_app_data))
+        application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, start))
+        
+        # Add callback query handler
+        from telegram.ext import CallbackQueryHandler
+        application.add_handler(CallbackQueryHandler(handle_callback_query))
+        
+        # Run the bot
+        print("🚀 Escrowflow bot is starting...")
+        logger.info("Bot started successfully")
+        application.run_polling(allowed_updates=Update.ALL_TYPES, drop_pending_updates=True)
+        
+    except Exception as e:
+        logger.error(f"Failed to start bot: {e}")
+        raise
 
 if __name__ == '__main__':
     main()
