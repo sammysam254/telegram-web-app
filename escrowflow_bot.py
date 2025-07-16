@@ -1,7 +1,10 @@
 import json
 import logging
+import os
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
+from flask import Flask, jsonify
+import threading
 
 # Configure logging
 logging.basicConfig(
@@ -10,8 +13,15 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Your bot token
-BOT_TOKEN = "8125885886:AAF1Q4MiOHNiTSo2BhjEmnUiQ39yAtGzDYs"
+# Your bot token (using environment variable for security)
+BOT_TOKEN = os.getenv("BOT_TOKEN", "8125885886:AAF1Q4MiOHNiTSo2BhjEmnUiQ39yAtGzDYs")
+
+# Flask app for health check
+app = Flask(__name__)
+
+@app.route('/health')
+def health_check():
+    return jsonify({"status": "healthy", "service": "escrowflow-bot"})
 
 # Your web app URL (using the registered short_name)
 WEB_APP_URL = "https://t.me/Escrowflow_bot/Escrowflow"
@@ -152,8 +162,18 @@ async def handle_callback_query(update: Update, context: ContextTypes.DEFAULT_TY
     elif query.data == "support":
         await support_command(update, context)
 
+def run_flask():
+    """Run Flask app for health checks"""
+    port = int(os.environ.get('PORT', 10000))
+    app.run(host='0.0.0.0', port=port, debug=False)
+
 def main() -> None:
     """Start the bot."""
+    # Start Flask app in a separate thread for health checks
+    flask_thread = threading.Thread(target=run_flask)
+    flask_thread.daemon = True
+    flask_thread.start()
+    
     # Create application
     application = Application.builder().token(BOT_TOKEN).build()
     
@@ -170,6 +190,7 @@ def main() -> None:
     
     # Run the bot
     print("🚀 Escrowflow bot is starting...")
+    logger.info("Bot started successfully")
     application.run_polling(allowed_updates=Update.ALL_TYPES)
 
 if __name__ == '__main__':
