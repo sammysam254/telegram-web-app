@@ -1,1 +1,1 @@
-web: gunicorn --worker-class sync --workers 1 app:application
+web: gunicorn --workers 1 --threads 4 app:application
