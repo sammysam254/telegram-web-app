@@ -8,7 +8,7 @@ services:
     startCommand: python escrowflow_bot.py
     envVars:
       - key: BOT_TOKEN
-        value: 8125885886:AAF1Q4MiOHNiTSo2BhjEmnUiQ39yAtGzDYs
+        value: 8125885886:AAGcoIuTJ0hA7ASMYckc86STF3xruOCfygE
       - key: PYTHON_VERSION
         value: 3.11.0
     autoDeploy: true
