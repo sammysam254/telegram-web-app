@@ -3,12 +3,11 @@ services:
   - type: web
     name: escrowflow-bot
     runtime: python
-    pythonVersion: "3.9.7"
     buildCommand: "pip install -r requirements.txt"
     startCommand: "python app.py"
     envVars:
       - key: TELEGRAM_BOT_TOKEN
         value: "8125885886:AAF1Q4MiOHNiTSo2BhjEmnUiQ39yAtGzDYs"
-    plan: free  # Starter free tier (upgrade later if needed)
-    autoDeploy: true  # Optional: Automatic deploys on git push
-    region: oregon  # or any preferred region
+    plan: free
+    autoDeploy: true
+    region: oregon
