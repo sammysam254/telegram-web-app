@@ -1,23 +1,20 @@
+# render.yaml
 services:
   - type: web
     name: escrowflow-bot
-    runtime: python
-    pythonVersion: "3.10.13"  # Explicit version
-    buildCommand: |
-      python -m pip install --upgrade pip
-      pip install --no-cache-dir -r requirements.txt
-    startCommand: gunicorn --workers 1 --threads 4 --timeout 120 app:application
-    envVars:
-      - key: TELEGRAM_BOT_TOKEN
-        value: "8125885886:AAF1Q4MiOHNiTSo2BhjEmnUiQ39yAtGzDYs"
-      - key: PYTHONUNBUFFERED
-        value: "1"
-    plan: free
-    region: oregon
-    autoDeploy: true
-    healthCheckPath: /health
     env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python escrowflow_bot.py
+    envVars:
+      - key: BOT_TOKEN
+        value: 8125885886:AAF1Q4MiOHNiTSo2BhjEmnUiQ39yAtGzDYs
+      - key: PYTHON_VERSION
+        value: 3.11.0
+    autoDeploy: true
+    branch: main
+    healthCheckPath: /health
     disk:
-      name: data
+      name: escrowflow-disk
       mountPath: /data
       sizeGB: 1
