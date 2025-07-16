@@ -14,7 +14,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Your bot token (using environment variable for security)
-BOT_TOKEN = os.getenv("BOT_TOKEN", "8125885886:AAF1Q4MiOHNiTSo2BhjEmnUiQ39yAtGzDYs")
+BOT_TOKEN = os.getenv("BOT_TOKEN", "8125885886:AAGcoIuTJ0hA7ASMYckc86STF3xruOCfygE")
 
 # Flask app for health check
 app = Flask(__name__)
